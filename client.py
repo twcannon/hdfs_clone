@@ -3,17 +3,50 @@ import sys
 
 
 def send_to_node(block_uuid,data,nodes):
+    print("sending: " + str(block_uuid) + str(nodes))
+    node=nodes[0]
+    nodes=nodes[1:]
+    host,port=node
+    
+    conn=rpyc.connect(host,port=port)
+    node = conn.root.Minion()
+    node.put(block_uuid,data,nodes)
+
 
 
 def read_from_node(block_uuid,node):
+    host,port = node
+    conn=rpyc.connect(host,port=port)
+    node = conn.root.Minion()
+    return node.get(block_uuid)
 
 
 def get(master,fname):
-  print('get works')
+    file_table = master.get_file_table_entry(fname)
+    if not file_table:
+        LOG.info("404: file not found")
+        return
+
+    for block in file_table:
+        for m in [master.get_nodes()[_] for _ in block[1]]:
+          data = read_from_node(block[0],m)
+          if data:
+            sys.stdout.write(data)
+            break
+        else:
+            LOG.info("No blocks found. Possibly a corrupt file")
+
 
 
 def put(master,source,dest):
-  print('put works')
+    size = os.path.getsize(source)
+    blocks = master.write(dest,size)
+    with open(source) as f:
+        for b in blocks:
+            data = f.read(master.get_block_size())
+            block_uuid=b[0]
+            nodes = [master.get_nodes()[_] for _ in b[1]]
+            send_to_node(block_uuid,data,nodes)
 
 
 def main(args):

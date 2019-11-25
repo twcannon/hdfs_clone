@@ -1,5 +1,6 @@
 import rpyc
 import pickle
+import uuid
 
 from rpyc.utils.server import ThreadedServer
 
@@ -27,26 +28,39 @@ class MasterServer(rpyc.Service):
     block_size = 0
     dup = 0
 
-    # def read(self,fname):
-    #       return mapping
+    def read(self,fname):
+        mapping = self.__class__.file_table[fname]
+        return mapping
 
-    # def write(self,dest,size):
-    #     return blocks
+    def write(self,dest,size):
+        self.__class__.file_table[dest]=[]
+        num_blocks = self.calc_num_blocks(size)
+        blocks = self.alloc_blocks(dest,num_blocks)
+        return blocks
 
-    # def get_file_table_entry(self,fname):
-    #     return None
+    def get_file_table_entry(self,fname):
+        if fname in self.__class__.file_table:
+            return self.__class__.file_table[fname]
+        else:
+            return None
 
-    # def get_block_size(self):
-    #     return self.__class__.block_size
+    def get_block_size(self):
+        return self.__class__.block_size
 
-    # def get_nodes(self):
-    #     return self.__class__.nodes
+    def get_nodes(self):
+        return self.__class__.nodes
 
-    # def get_num_blocks(self,size):
-    #     return int(math.ceil(float(size)/self.__class__.block_size))
+    def get_num_blocks(self,size):
+        return int(math.ceil(float(size)/self.__class__.block_size))
 
-    # def allocate(self,dest,num_blocks):
-    #     return blocks
+    def allocate(self,dest,num_blocks):
+        blocks = []
+        for i in range(0,num):
+            block_uuid = uuid.uuid1()
+            nodes_ids = random.sample(self.__class__.nodes.keys(),self.__class__.dup)
+            blocks.append((block_uuid,nodes_ids))
+            self.__class__.file_table[dest].append((block_uuid,nodes_ids))
+        return blocks
 
 
 if __name__ == "__main__":
