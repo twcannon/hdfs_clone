@@ -25,8 +25,8 @@ class MinionService(rpyc.Service):
         return f.read()   
  
     def forward(self,block_uuid,data,minions):
-      print "8888: forwaring to:"
-      print block_uuid, minions
+      print("8888: forwaring to:")
+      print(block_uuid, minions)
       minion=minions[0]
       minions=minions[1:]
       host,port=minion
