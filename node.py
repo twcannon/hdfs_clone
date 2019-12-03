@@ -33,8 +33,8 @@ class NodeService(rpyc.Service):
         node = conn.root.Minion()
         node.put(block_uuid,data,nodes)
 
-    def delete_block(self,uuid):
-        ## here we need to delete the block
+    # def delete_block(self,uuid):
+    #     ## here we need to delete the block
 
 if __name__ == "__main__":
     if not os.path.isdir(TEMP_DIR): os.mkdir(TEMP_DIR)
