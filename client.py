@@ -1,5 +1,7 @@
 import rpyc
 import sys
+import os
+
 
 
 def send_to_node(block_uuid,data,nodes):
@@ -50,8 +52,8 @@ def put(master,source,dest):
 
 
 def main(args):
-  con=rpyc.connect("localhost",port=2131)
-  master=con.root.Master()
+  conn=rpyc.connect("localhost",port=2131)
+  master=conn.root.Master()
   
   if args[0] == "get":
     get(master,args[1])

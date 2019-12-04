@@ -4,41 +4,43 @@ import os
 
 from rpyc.utils.server import ThreadedServer
 
-DATA_DIR="/tmp/minion/"
+port = 8888
 
-class MinionService(rpyc.Service):
-  class exposed_Minion():
+DATA_DIR="/tmp/node/"
+
+print("\nRunning node on port: "+str(port))
+print("\n----------------------------")
+
+class NodeService(rpyc.Service):
     blocks = {}
 
-    def exposed_put(self,block_uuid,data,minions):
-      with open(DATA_DIR+str(block_uuid),'w') as f:
-        f.write(data)
-      if len(minions)>0:
-        self.forward(block_uuid,data,minions)
+    def put(self,block_uuid,data,nodes):
+        with open(DATA_DIR+str(block_uuid),'w') as f:
+            f.write(data)
+        if len(nodes)>0:
+            self.forward(block_uuid,data,nodes)
 
 
-    def exposed_get(self,block_uuid):
-      block_addr=DATA_DIR+str(block_uuid)
-      if not os.path.isfile(block_addr):
-        return None
-      with open(block_addr) as f:
-        return f.read()   
+    def get(self,block_uuid):
+        block_addr=DATA_DIR+str(block_uuid)
+        if not os.path.isfile(block_addr):
+            return None
+        with open(block_addr) as f:
+            return f.read()   
  
-    def forward(self,block_uuid,data,minions):
-      print("8888: forwaring to:")
-      print(block_uuid, minions)
-      minion=minions[0]
-      minions=minions[1:]
-      host,port=minion
+    def forward(self,block_uuid,data,nodes):
+        print(str(port)+": forwaring to:")
+        print(block_uuid, nodes)
+        node=nodes[0]
+        nodes=nodes[1:]
+        host,port=node
 
-      con=rpyc.connect(host,port=port)
-      minion = con.root.Minion()
-      minion.put(block_uuid,data,minions)
+        conn=rpyc.connect(host,port=port)
+        node = conn.root.Minion()
+        node.put(block_uuid,data,nodes)
 
-    def delete_block(self,uuid):
-      pass
 
 if __name__ == "__main__":
-  if not os.path.isdir(DATA_DIR): os.mkdir(DATA_DIR)
-  t = ThreadedServer(MinionService, port = 8888)
-  t.start()
+    if not os.path.isdir(DATA_DIR): os.mkdir(DATA_DIR)
+    thread = ThreadedServer(NodeService, port = 8888)
+    thread.start()

@@ -1,8 +1,12 @@
 import rpyc
 import pickle
 import uuid
+import os
+import signal
+import sys
 
 from rpyc.utils.server import ThreadedServer
+
 
 def int_handler(signal, frame):
     pickle.dump((MasterServer.file_table,MasterServer.block_mapping),open('file_server.img','wb'))
@@ -10,8 +14,13 @@ def int_handler(signal, frame):
 
 def get_config():
     MasterServer.block_size = 10
-    MasterServer.dup = 2
-    nodes = [os.environ['NODE1'],os.environ['NODE2']]
+    MasterServer.dup = 1
+    nodes = ['1:153.9.254.197:8888']
+    print("\nStarting master with:")
+    print("block_size: "+str(MasterServer.block_size))
+    print("duplication number: "+str(MasterServer.dup))
+    print("number of nodes: "+str(len(nodes)))
+    print("\n-------------------------------")
     # nodes saved in format numerical_id:host:port
     for m in nodes:
         id,host,port=m.split(":")
