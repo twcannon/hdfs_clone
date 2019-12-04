@@ -21,7 +21,14 @@ On line 18 on `master.py`, you must insert the id numbers, ip addresses, and por
 
 ## System Use
 
-### Running the `client.py` file
+### Running the `client.py` File
 
-#### Example
+The main functions of the system are `put` and `get`. Below, we describe how to use the system to store and retrieve files on the system. A sample file `cat64ms.00105` is included. In the examples below, it is saved and retrieved in the system as `sample.txt`.  
+
+#### Put
+##### Example `put` Call
 `python client.py put cat64ms.00105 sample.txt`
+
+#### Get
+##### Example `get` Call
+`python client.py get sample.txt`
